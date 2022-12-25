@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <input type="file" accept=".txt" id="file-input" />
+    <p>input text here ↓</p> 
+    <textarea id="text"></textarea>
+    <p>You can choose the function you want to use</p>
+    <label>
+      <input type="radio" name="input-method" value="file" /> File
+    </label>
+    <label>
+      <input type="radio" name="input-method" value="text" checked /> Text
+    </label>
+    <button id="convert-button">Convert</button>
+    <pre id="json"></pre>
+    <p>No matter which function you use, you need to input it like this.</p>
+    <p></p>
+    <p>apple,蘋果</p>
+    <style>
+    p {
+      line-height: 0;
+    }
+     </style>
+    <p> banana,香蕉</p>
+    <p>orange,橙子</p>
+    <p>pear,梨</p>
+   <p>strawberry,草莓</p>
+    <p>blueberry,藍莓</p>
+    <script>
+      const fileInput = document.getElementById('file-input');
+      const textarea = document.getElementById('text');
+      const button = document.getElementById('convert-button');
+      const pre = document.getElementById('json');
+      button.addEventListener('click', () => {
+        const inputMethod = document.querySelector('input[name="input-method"]:checked').value;
+        let text;
+        if (inputMethod === 'file') {
+          const file = fileInput.files[0];
+
+          if (!file) {
+            alert('Please select a .txt file');
+            return;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            text = reader.result;
+
+            const lines = text.split('\n');
+
+            const data = [];
+
+            for (const line of lines) {
+              const [key, value] = line.split(',');
+              data.push({ en: key, ch: value });
+            }
+
+            const json = JSON.stringify(data);
+
+            pre.textContent = json;
+
+            const blob = new Blob([json], { type: 'application/json' });
+
+            saveAs(blob, 'output.json');
+          };
+
+          reader.readAsText(file);
+        } else {
+          text = textarea.value;
+          const lines = text.split('\n');
+          const data = [];
+
+          for (const line of lines) {
+            const [key, value] = line.split(',');
+            data.push({ en: key, ch: value });
+          }
+
+          const json = JSON.stringify(data);
+          pre.textContent = json;
+          const blob = new Blob([json], { type: 'application/json' });
+          saveAs(blob, 'output.json');
+        }
+      });
+    </script>
+  </body>
+</html>
